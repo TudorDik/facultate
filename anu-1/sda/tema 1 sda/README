@@ -1,0 +1,40 @@
+# Tema 1 - Sistem de Gestionare a Apelurilor de Urgență 112
+
+## Nume: DICU
+## Prenume: TUDOR MIHAI
+## Grupa: 313CD
+
+## 1. Structuri de Date Utilizate
+Tema a fost implementată respectând constrângerile cerinței, utilizând următoarele structuri de date:
+* **Lista dublu înlănțuită circulară cu santinelă**: Utilizată pentru stocarea incidentelor și a 
+	intervențiilor. Santinela (nodul fictiv cu ID 0) facilitează foarte mult operațiile de inserare și parcurgere, 
+	eliminând necesitatea de a trata separat cazurile particulare (ex: listă vidă).
+
+* **Cozi (Queue - FIFO)**: Am implementat 4 cozi cu noduri generice (folosind pointeri de tip `void*`) 
+	pentru a evita duplicarea codului. Acestea sunt folosite pentru gestionarea disponibilității 
+	echipajelor (`q_avail`) și pentru cozile de așteptare ale incidentelor, separate pe grade de prioritate 
+	(`q_high`, `q_med`, `q_low`). Cozile stochează doar referințe către memorie, fără a copia structurile.
+
+* **Stiva (Stack - LIFO)**: Folosită pentru a stoca istoricul de intervenții (`history`), permițând funcționarea 
+	eficientă a comenzii de anulare a ultimei acțiuni.
+
+## 2. Logica Implementării Operațiilor Principale
+* **ADD_INCIDENT**: Incidentele noi sunt adăugate la finalul listei circulare mari și, simultan, introduse 
+	în coada corespunzătoare severității lor (high/medium/low).
+
+* **DISPATCH**: Extrage incidentul din cea mai prioritară coadă nevidă (verificând în ordinea High -> Medium -> Low) 
+	și îl asignează primului echipaj extras din coada de disponibilitate. Ambele își schimbă statusul, iar 
+	noua intervenție este adăugată la finalul listei de intervenții și salvată în stiva de istoric.
+
+* **UNDO_LAST_DISPATCH**: Extrage intervenții din stivă până când găsește una nefinalizată (fără statusul "solved"). 
+	Odată găsită, incidentul este repus la începutul cozii sale de așteptare (folosind o funcție auxiliară 
+	`enqueue_front`), iar echipajul este trimis înapoi la finalul cozii de disponibilitate.
+
+* **SOLVED_INCIDENT**: Parcurge lista de intervenții pentru a găsi incidentul cerut, îi actualizează 
+	statusul și eliberează echipajul asociat, care redevine disponibil.
+
+## 3. Gestionarea Memoriei (Bonus Valgrind)
+Pentru a asigura rularea fără memory leaks, am implementat funcția `cleanup_system`. 
+Aceasta este apelată la finalul programului și are rolul de a goli complet toate cozile și stivele 
+(folosind `dequeue` și `pop`), urmate de parcurgerea și eliberarea completă a nodurilor alocate dinamic pentru 
+incidentele și intervențiile din listele circulare (inclusiv string-urile alocate pentru descrieri).

@@ -1,0 +1,92 @@
+# Tema 2 - Simplified File Indexing System
+
+## Last name: DICU
+## First name: TUDOR MIHAI
+## Group: 313CD
+
+## 1. Data Structures Used
+
+This assignment implements a file indexing system based on keywords, while
+respecting all the mandatory constraints:
+
+* **Doubly linked list (FileNode)**: keeps the files in the order they are
+	added. Each node stores the file identifier, the relevance score, a
+	dynamic array of keywords and prev/next pointers, which allow O(1) removal
+	once the node has been located.
+
+* **Multi-way retrieval tree (RetrievalNode)**: a tree with a branching
+	factor of 26 (lowercase letters a-z). Every path from the root to a
+	terminal node represents a keyword. Terminal nodes hold a linked list of
+	references (FileRef) to the FileNode entries that contain that keyword.
+	The references are kept sorted lexicographically by id, so FIND and PRINT
+	produce already ordered results without extra sorting.
+
+* **Max-heap (Heap)**: a dynamic array of FileNode pointers, used by TOPK.
+	Priority is given first by score (higher score = higher priority) and
+	ties are broken by the lexicographically smaller id. The heap is built
+	through repeated pushes (O(n log n)) and then the first k elements are
+	extracted with successive pops.
+
+## 2. Operation Logic
+
+* **ADD**: if the id does not exist, a FileNode is created, appended to the
+	list and, for each unique keyword, a reference is inserted into the tree.
+	Duplicate keywords inside the same command are ignored. If the id already
+	exists, the t words are still consumed from the input (so the parser
+	stays aligned) and EXISTS is printed.
+
+* **DEL**: the file is located in the list and removed from every terminal
+	node corresponding to its keywords (with recursive cleanup of nodes that
+	are no longer needed); afterwards it is unlinked from the list and freed.
+
+* **ADDKW**: if the file is missing -> NOT FOUND. If the pair (id, keyword)
+	already exists, OK is printed without any modification. Otherwise the
+	keyword is added both to the file's keyword list and to the tree.
+
+* **DELKW**: if the file is missing -> NOT FOUND. If the file does not have
+	that keyword, OK is printed without changes. Otherwise the reference is
+	removed from the tree (with cleanup) and the keyword is removed from the
+	file's list. If, after the removal, the file has no remaining keywords,
+	it is removed from the system entirely.
+
+* **FIND**: the characters of the keyword are followed in the tree. If the
+	path exists and the node is terminal with at least one reference, the
+	count and the ids are printed (already sorted lexicographically by
+	construction). Otherwise: EMPTY.
+
+* **TOPK**: after locating the terminal node, every reference is inserted
+	into a max-heap. min(k, total) elements are then extracted with heap_pop,
+	each pop costing O(log n).
+
+* **PRINT**: a DFS over the tree in alphabetical order of children. For
+	every terminal node with references, the reconstructed word is printed
+	together with its file list. If the tree contains no keyword at all,
+	EMPTY is printed instead.
+
+* **PREFIX (Bonus)**: the prefix is followed inside the tree. If the path
+	does not exist, EMPTY is printed. Otherwise a DFS is performed on the
+	subtree, collecting all file references from the terminal nodes. The
+	list is sorted by id with qsort and then deduplicated (a file may appear
+	through multiple keywords that share the prefix). The final result is
+	displayed in lexicographic order of the ids.
+
+## 3. Tree Cleanup After Deletions
+
+Both DEL and DELKW can leave "dead" nodes inside the tree. When a file
+reference is removed from a terminal node, if no references remain, the node
+is unmarked as terminal. The algorithm then walks up the tree, deleting each
+node that:
+* is no longer terminal for some other keyword;
+* has no remaining children.
+
+The process stops at the first node that is either still terminal for some
+other keyword or that still has at least one child, keeping the tree
+consistent and free of useless nodes.
+
+## 4. Memory Management
+
+The `cleanup_system` function is invoked at the end of the program. It
+recursively frees the whole tree (including the FileRef entries from the
+terminal nodes), then walks through the doubly linked list and frees each
+FileNode (id, the keywords array together with every individual string, and
+the structure itself). No memory leaks remain.
