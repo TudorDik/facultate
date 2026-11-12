@@ -1,0 +1,55 @@
+# Window Join, Akari, and Helicopters Implementation README
+
+## Overview
+
+This project contains three distinct programs, each solving a specific problem:
+
+1. **Window Join Calculations:** Computes LCM and GCD of values in a sliding window.
+2. **Akari (Light Puzzle) Solver:** Simulates light propagation in a grid, validates the placement of lights, and marks illuminated cells.
+3. **Helicopter Diagonal Analysis:** Evaluates diagonals in a matrix to detect invalid or mostly empty placements.
+
+Each implementation focuses on clear logic, modularity, and proper memory handling.
+
+## 1. Window Join Calculations
+
+- **Objective:** Given a sequence of pairs `(t, x)` and a window size, compute LCM and GCD for pairs whose `t` values fall within the window.
+- **Data Structures:** A flat dynamic array stores the input pairs.
+- **Functions:**
+  - `gcd(a, b)` using Euclid’s algorithm.
+  - `lcm(a, b)` using the relation `lcm(a, b) = a / gcd(a, b) * b`.
+- **Design Choices:**
+  - Input continues until `(0, 0)` is entered.
+  - Nested loops check all valid pairs within the window.
+  - Memory is dynamically allocated and freed properly.
+
+## 2. Akari (Light Puzzle) Solver
+
+- **Objective:** Fill and validate a grid with lights ('L') and numbered cells (0-4) according to Akari rules.
+- **Data Structures:** A 2D dynamic array represents the grid.
+- **Functions:**
+  - `mark_direction()` to propagate light in four directions.
+  - `fill_adjacent()` to mark empty cells next to numbers.
+  - `check_lights()` and `check_numbers()` for validation.
+- **Design Choices:**
+  - Propagation is handled using `dx` and `dy` arrays to avoid repetitive code.
+  - Validation is separated from propagation for modularity.
+  - Output is printed after all updates, ensuring readability.
+
+## 3. Helicopter Diagonal Analysis
+
+- **Objective:** Analyze diagonals in a matrix to determine if helicopter placements are valid and count zeros.
+- **Data Structures:** A dynamically allocated 2D array with 1-based indexing.
+- **Functions:**
+  - `task1()` and `task2()` traverse diagonals in different directions.
+  - `swap()` efficiently exchanges two coordinates using XOR.
+- **Design Choices:**
+  - Handles diagonals left-to-right, right-to-left, and bottom-to-top.
+  - Counts zeros along diagonals to identify incorrect placements.
+  - Results are stored in a separate array for reporting.
+
+## General Notes
+
+- **Modularity:** Functions are separated by task to avoid deep indentation and improve readability.
+- **Memory Management:** All dynamic allocations are freed to prevent leaks.
+- **Scalability:** Implementations handle variable input sizes efficiently.
+- **Code Style:** Minimal use of spaces ensures compatibility with automated checkers.

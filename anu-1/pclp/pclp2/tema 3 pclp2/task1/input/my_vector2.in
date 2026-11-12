@@ -1,0 +1,9 @@
+5
+push 5
+push 10
+set 100 1
+get 1
+set 99 2
+get 2
+print
+free

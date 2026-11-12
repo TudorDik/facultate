@@ -1,0 +1,9 @@
+10
+get 0
+pop
+push 7
+print
+pop
+pop
+print
+free

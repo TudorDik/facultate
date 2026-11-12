@@ -1,0 +1,2 @@
+"Hello from %s, my favorite letter is %c and my favorite number is %lu.\n"
+"Alex" 'x' 67

@@ -1,0 +1,7 @@
+Error: len <= 0
+The vector is empty
+0
+v -> {([7][][][][][][][][][]), 1, 10}
+7
+The vector is empty
+v -> {([][][][][]), 0, 5}

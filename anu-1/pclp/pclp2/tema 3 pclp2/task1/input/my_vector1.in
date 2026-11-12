@@ -1,0 +1,14 @@
+1
+push 10
+push 20
+print
+push 30
+print
+pop
+pop
+print
+pop
+print
+pop
+print
+free

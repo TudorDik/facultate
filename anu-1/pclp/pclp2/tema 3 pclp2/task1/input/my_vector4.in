@@ -1,0 +1,11 @@
+2
+push 1
+push 2
+push 3
+push 4
+push 5
+print
+get 0
+get 4
+get 5
+free

@@ -1,0 +1,38 @@
+Runic: L-System & Bitmap Graphics Engine
+Overview
+This project implements a procedural graphics generator in C, capable of rendering L-Systems, handling Bitmap (BDF) fonts, and performing basic steganography. The architecture is strictly modular, separating low-level data management from high-level application logic.
+
+Architecture
+utils.h (The Foundation)
+This file defines the core data structures (image, font, program_state) and handles all memory management. It implements two specific data structures chosen for their algorithmic efficiency in this context:
+
+Queue (FIFO): Used for input parsing. A queue is essential here to process command-line tokens (commands and arguments) sequentially, ensuring execution happens in the exact order the user intends.
+
+Stack (LIFO): Used for state management. This is the backbone of the Undo/Redo system. Since the "Undo" action naturally requires reverting to the most recent previous state, a Last-In-First-Out structure is the optimal choice.
+
+runic.c (The Engine)
+This file contains the main loop and application logic. It links the tools from utils to execute complex tasks:
+
+Turtle Graphics: Implements the L-System expansion. It uses Bresenham's line algorithm for drawing. Crucially, it uses a local stack to handle branching (the [ and ] characters), allowing the "turtle" to save and restore its position and angle during fractal generation.
+
+State Control: Before any destructive operation (drawing, loading files), a deep copy of the current program_state is pushed onto the global undo stack, ensuring robust history navigation.
+
+This separation of concerns keeps runic.c clean and focused on logic, while utils.h abstracts away the complexity of memory allocation and pointer manipulation.
+
+Technical Deep Dive
+Procedural Generation: L-System Derivation
+The core of the procedural generation lies in the app_der_to_buff function. To handle string expansion efficiently, the engine employs a double-buffering technique. During each iteration of the L-System derivation, the current string (Axiom) is read and expanded into a secondary buffer. This avoids the overhead of constant reallocations and the complexity of in-place string modification. Once the derivation is complete, the buffers are swapped, allowing the engine to handle thousands of symbols without significant performance degradation.
+
+Graphics Rendering: The Rasterization Layer
+The drawing logic operates on a custom image structure, which maps pixels in a 2D array. A dedicated set_pixel_safe function acts as a guardrail, preventing out-of-bounds memory access (segmentation faults) and handling the coordinate system transformation. While standard screen coordinates often place (0,0) at the top-left, Runic treats the bottom-left as the origin to align with traditional mathematical Cartesian logic.
+
+Lines are drawn using Bresenham’s Algorithm, which is implemented to use only integer arithmetic (additions and bit-shifts). This ensures that the turtle graphics remain fast and precise even when generating highly complex fractal structures like the Dragon Curve or Sierpinski triangles.
+
+Typography: BDF Font Processing
+The engine includes a robust parser for Bitmap Distribution Format (BDF) files. Unlike simple fixed-width fonts, Runic supports variable-width glyphs by respecting the DWIDTH (device width) and BBX (bounding box) metrics. Each character is rendered bit-by-bit from its hexadecimal representation, allowing for high-fidelity text overlays on generated images.
+
+Steganography and Data Integrity
+Beyond graphics, Runic features a steganographic module. The BITCHECK command implements a Least Significant Bit (LSB) analysis across the RGB channels. It is designed to detect and "repair" data corruption by scanning for specific bit-flip patterns (e.g., 0010 or 1101). This demonstrates the engine's capability to treat image data as a generic bit-stream for hidden message storage and verification.
+
+Memory Philosophy
+The project strictly adheres to the Linux Kernel coding style, emphasizing a "no global variables" policy. Every function receives its required context through pointers, ensuring that the program_state remains isolated and thread-safe. Extensive "deep copy" logic ensures that when a state is pushed to the Undo stack, every nested pointer (including pixel arrays and font glyphs) is duplicated, preventing pointer dangling and memory leaks during complex operations.

@@ -1,0 +1,18 @@
+2
+print
+get 1
+set 0 1
+pop
+push 1
+print
+push 2
+print
+push 3
+print
+set 1 1
+print
+get 2
+pop
+print
+get 2
+free

@@ -1,0 +1,116 @@
+BATTLESHIP GAME + STATISTICS + HILL CIPHER
+
+This project implements a complete Battleship-style game system with
+post-game statistics and optional encrypted commands using the Hill
+Cipher (modulo 37). The program is written entirely in C and respects
+strict memory management and coding style constraints.
+
+  -------------------
+  GENERAL STRUCTURE
+  -------------------
+
+The application is split into three logical parts:
+
+1)  GAME ENGINE (Task 1)
+2)  STATISTICS PROCESSING (Task 2)
+3)  ENCRYPTED COMMAND SYSTEM – HILL CIPHER (Task 3)
+
+  ------------------------------------
+  1) BATTLESHIP GAME ENGINE (Task 1)
+  ------------------------------------
+
+The game simulates multiple independent matches between two players. For
+each match:
+
+-   The board size is read (n x m)
+-   The number of ships is computed automatically
+-   Players place ships alternately
+-   Invalid ship placements are rejected with a message
+-   The boards are printed
+-   Attacks are executed turn by turn
+-   Each hit or miss is printed with a detailed message
+-   Ships are tracked until destroyed
+-   When all ships of a player are destroyed, the match ends
+
+Each match collects: 
+- Total number of hits 
+- Total number of shots
+
+  -------------------------------
+  2) STATISTICS SYSTEM (Task 2)
+  -------------------------------
+
+After all matches are finished, aggregated statistics are stored:
+
+For each player: 
+- hits (lv) 
+- total attacks (tt) 
+- match weight
+
+The program accepts commands of the form:
+
+OUxxx.yyMIN / MAX OTxxx.yyMIN / MAX PUxxx.yyMIN / MAX PTxxx.yyMIN / MAX
+
+Where: 
+- O / P : Player 1 or Player 2 
+- U / T : Single match or total game - xxx.yy : Target accuracy 
+- MIN / MAX : Minimization or maximization strategy
+
+The output format is always: AAA.BB.X
+
+  ------------------------------------
+  3) HILL CIPHER ENCRYPTION (Task 3)
+  ------------------------------------
+
+Commands and responses can be encrypted using Hill Cipher modulo 37.
+
+Alphabet: - ‘0’–‘9’ → 0–9 - ‘A’–‘Z’ → 10–35 - ‘.’ → 36
+
+Features: 
+- Automatic matrix extraction from key 
+- Modular determinant computation 
+- Modular inverse (Extended Euclid) 
+- Matrix adjugate -
+Block-wise encryption/decryption
+
+If the key is “-”: 
+- Commands are read in plain text
+
+Otherwise: - Commands are decrypted before processing - Results are
+encrypted before output
+
+  -------------------
+  MEMORY MANAGEMENT
+  -------------------
+
+All dynamically allocated memory is explicitly freed: 
+- Boards 
+- Ships 
+- Hill cipher matrices 
+- Statistics buffers
+
+No global variables are used.
+
+  -------------
+  COMPILATION
+  -------------
+
+Compile using:
+
+gcc -std=c99 -Wall -Wextra main.c -o battleship
+
+  --------------
+  AUTHOR NOTES
+  --------------
+
+This implementation respects: 
+- Strict 80-column rule 
+- No global
+state 
+- Functional decomposition 
+- Defensive memory management 
+- Deterministic output format
+
+  ---------------
+  END OF README
+  ---------------
